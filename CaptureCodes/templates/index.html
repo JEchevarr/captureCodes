@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Geology Capture Codes</title>
+</head>
+<body>
+    <h1>Geology Observation Capture</h1>
+    <form id="observationForm">
+        <label for="locationType">Location Type:</label>
+        <select id="locationType" name="location_type">
+            <option value="Field Station">Field Station</option>
+            <option value="Drill Hole">Drill Hole</option>
+        </select><br><br>
+        
+        <label for="locationDetail">Location Detail (e.g., coordinates or meterage):</label>
+        <input type="text" id="locationDetail" name="location_detail"><br><br>
+
+        <label for="captureCode">Capture Code:</label>
+        <input type="text" id="captureCode" name="capture_code"><br><br>
+
+        <label for="observationDate">Observation Date:</label>
+        <input type="date" id="observationDate" name="observation_date"><br><br>
+
+        <button type="button" onclick="submitObservation()">Submit</button>
+    </form>
+
+    <h2>Query Observations</h2>
+    <label for="filter">Filter by Capture Code:</label>
+    <input type="text" id="filter" name="filter">
+    <button type="button" onclick="queryObservations()">Query</button>
+
+    <div id="results"></div>
+
+    <script>
+        function submitObservation() {
+            const data = {
+                location_type: document.getElementById('locationType').value,
+                location_detail: document.getElementById('locationDetail').value,
+                capture_code: document.getElementById('captureCode').value,
+                observation_date: document.getElementById('observationDate').value,
+            };
+
+            fetch('/add_observation', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            }).then(response => response.json())
+              .then(data => alert('Observation added successfully!'));
+        }
+
+        function queryObservations() {
+            const filter = document.getElementById('filter').value;
+            fetch(`/query_observations?filter=${filter}`)
+                .then(response => response.json())
+                .then(data => {
+                    let output = '<h3>Query Results:</h3><ul>';
+                    data.forEach(obs => {
+                        output += `<li>${obs[1]} - ${obs[2]} - ${obs[3]} (${obs[4]})</li>`;
+                    });
+                    output += '</ul>';
+                    document.getElementById('results').innerHTML = output;
+                });
+        }
+    </script>
+</body>
+</html>
